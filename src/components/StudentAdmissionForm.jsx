@@ -141,10 +141,11 @@ const StudentAdmissionForm = () => {
         <Header />
 
     <div className="min-h-screen bg-gray-100 py-8 px-2">
-      <div className="bg-white rounded-lg shadow-lg max-w-6xl mx-auto p-8">
-        <div className="mb-2 text-sm text-gray-500">
+      <div className="mb-2 text-sm text-gray-500">
           Home &gt; <span className="text-blue-600 cursor-pointer">Student Admission Form</span>
         </div>
+      <div className="bg-white rounded-lg shadow-lg max-w-6xl mx-auto p-8">
+        
         <h2 className="text-xl font-bold mb-2">Add Student</h2>
         <hr className="mb-6 border-gray-200" />
         {successMsg && <div className="mb-4 text-green-600 font-semibold">{successMsg}</div>}
