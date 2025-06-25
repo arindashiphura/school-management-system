@@ -27,7 +27,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { path: '/dashboard', icon: <FaHome />, label: 'Dashboard' },
-    { path: '/students', icon: <FaUserGraduate />, label: 'Students' },
+    { path: '/all-students', icon: <FaUserGraduate />, label: 'Students' },
     { path: '/teachers', icon: <FaChalkboardTeacher />, label: 'Teachers' },
     { path: '/parents', icon: <FaUsers />, label: 'Parents' },
     { path: '/library', icon: <FaBook />, label: 'Library' },

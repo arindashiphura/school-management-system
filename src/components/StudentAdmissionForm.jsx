@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import axios from 'axios';
 
 const StudentAdmissionForm = () => {
   const [formData, setFormData] = useState({
@@ -92,13 +93,29 @@ const StudentAdmissionForm = () => {
     if (Object.keys(validationErrors).length > 0) return;
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSuccessMsg('Student added successfully!');
-      setErrorMsg('');
-      handleReset();
+      const form = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null) {
+          form.append(key, value);
+        }
+      });
+      const response = await axios.post('http://localhost:8000/api/v1/students/add', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (response.data && response.data.success) {
+        setSuccessMsg('Student added successfully!');
+        setErrorMsg('');
+        handleReset();
+      } else {
+        setErrorMsg(response.data.message || 'Error submitting form. Please try again.');
+        setSuccessMsg('');
+      }
     } catch (error) {
-      setErrorMsg('Error submitting form. Please try again.');
+      setErrorMsg(
+        error.response?.data?.message || 'Error submitting form. Please try again.'
+      );
       setSuccessMsg('');
     } finally {
       setIsSubmitting(false);
