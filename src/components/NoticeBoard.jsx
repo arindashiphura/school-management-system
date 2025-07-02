@@ -11,7 +11,21 @@ const nameColors = [
   'text-blue-600',
 ];
 
+// Improved human-readable time ago function
+function timeAgo(date) {
+  const now = Date.now();
+  const then = new Date(date).getTime();
+  const diffSec = Math.floor((now - then) / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
 
+  if (diffSec < 60) return 'just now';
+  if (diffMin < 60) return `${diffMin} min ago`;
+  if (diffHr < 24) return diffHr === 1 ? '1 hr ago' : `${diffHr} hr ago`;
+  if (diffDay === 1) return 'yesterday';
+  return `${diffDay} days ago`;
+}
 
 const NoticeBoard = () => {
   const [notices, setNotices] = useState([]);
@@ -189,7 +203,7 @@ const NoticeBoard = () => {
                       </div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`font-semibold text-sm ${nameColors[idx % nameColors.length]}`}>{notice.postedBy}</span>
-                        <span className="text-xs text-gray-400">{Math.floor((Date.now() - new Date(notice.createdAt)) / 60000)} min ago</span>
+                        <span className="text-xs text-gray-400">{timeAgo(notice.createdAt)}</span>
                       </div>
                       <div className="text-gray-700 text-sm mb-1">{notice.details}</div>
                       <div className="border-b border-gray-200 mt-3" />

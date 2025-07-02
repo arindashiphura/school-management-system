@@ -12,6 +12,8 @@ import StudentPromotionForm from './components/StudentPromotionForm.jsx'
 import AllStudents from './components/AllStudents.jsx'
 import NoticeBoard from './components/NoticeBoard.jsx'
 import AddClass from './components/AddClass.jsx'
+import AllClasses from './components/AllClasses.jsx'
+
 
 // In your main App.js or index.js
 
@@ -27,6 +29,7 @@ const App = () => {
           <Route path="/all-students" element={<AllStudents />} />
           <Route path="/notice-board" element={<NoticeBoard />} />
           <Route path="/add-class" element={<AddClass />} />
+          <Route path="/all-classes" element={<AllClasses />} />
         </Routes>
       </Router>
     </div>
