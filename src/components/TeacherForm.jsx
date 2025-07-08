@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FiMinus, FiMaximize2, FiX } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import axios from 'axios';
 
 const TeacherForm = () => {
   const [formData, setFormData] = useState({
@@ -76,13 +77,32 @@ const TeacherForm = () => {
     if (Object.keys(validationErrors).length > 0) return;
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Build FormData for file upload
+      const form = new FormData();
+      form.append('teacherId', formData.idNo);
+      form.append('name', `${formData.firstName} ${formData.lastName}`);
+      form.append('gender', formData.gender);
+      form.append('subject', formData.subject);
+      form.append('class', formData.class);
+      form.append('section', formData.section);
+      form.append('address', formData.address);
+      form.append('dob', formData.dob);
+      form.append('mobile', formData.phoneNo);
+      form.append('email', formData.email);
+      if (formData.teacherPhoto) {
+        form.append('photo', formData.teacherPhoto);
+      }
+      // Post to backend
+      const res = await axios.post('http://localhost:8000/api/v1/teachers', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       setSuccessMsg('Teacher added successfully!');
       setErrorMsg('');
       handleReset();
     } catch (error) {
-      setErrorMsg('Error submitting form. Please try again.');
+      setErrorMsg(
+        error.response?.data?.message || 'Error submitting form. Please try again.'
+      );
       setSuccessMsg('');
     } finally {
       setIsSubmitting(false);

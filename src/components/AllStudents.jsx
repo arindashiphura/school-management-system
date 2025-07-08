@@ -82,6 +82,7 @@ const AllStudents = () => {
       <div className="flex-1 overflow-auto">
         <Header />
         <div className="bg-gray-100 py-8 px-2 min-h-screen">
+          {/* Breadcrumb */}
           <div className="mb-2 text-sm text-gray-500">
             Home &gt; <span className="text-blue-600 cursor-pointer">All Students</span>
           </div>
@@ -116,74 +117,75 @@ const AllStudents = () => {
               <button title="Maximize" onClick={handleMaximize} className="text-gray-500"><FiMaximize2 size={18} /></button>
               <button title="Close" onClick={handleClose} className="text-gray-500"><FiX size={18} /></button>
             </div>
-            {loading ? (
-              <div className="text-center py-8">Loading...</div>
-            ) : error ? (
-              <div className="text-center text-red-600 py-8">{error}</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm border">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-3 py-2 border">
-                        <input
-                          type="checkbox"
-                          checked={selectedRows.length === filteredStudents.length && filteredStudents.length > 0}
-                          onChange={handleMasterCheckbox}
-                        />
-                      </th>
-                      <th className="px-3 py-2 border">Roll</th>
-                      <th className="px-3 py-2 border">Photo</th>
-                      <th className="px-3 py-2 border">Name</th>
-                      <th className="px-3 py-2 border">Gender</th>
-                      <th className="px-3 py-2 border">Parent's Name</th>
-                      <th className="px-3 py-2 border">Class</th>
-                      <th className="px-3 py-2 border">Section</th>
-                      <th className="px-3 py-2 border">Address</th>
-                      <th className="px-3 py-2 border">Date of Birth</th>
-                      <th className="px-3 py-2 border">Mobile No.</th>
-                      <th className="px-3 py-2 border">Email</th>
-                      <th className="px-3 py-2 border">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredStudents.map((student, idx) => (
-                      <tr key={student._id || idx} className="border-b hover:bg-gray-50">
-                        <td className="px-3 py-2 border text-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedRows.includes(student._id)}
-                            onChange={() => handleRowSelect(student._id)}
+            {/* Table */}
+            <div className="overflow-x-auto rounded-lg">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-2 py-2 font-medium text-left"><input type="checkbox" /></th>
+                    <th className="px-2 py-2 font-medium text-left">Roll</th>
+                    <th className="px-2 py-2 font-medium text-left">Photo</th>
+                    <th className="px-2 py-2 font-medium text-left">Name</th>
+                    <th className="px-2 py-2 font-medium text-left">Gender</th>
+                    <th className="px-2 py-2 font-medium text-left">Parent's Name</th>
+                    <th className="px-2 py-2 font-medium text-left">Class</th>
+                    <th className="px-2 py-2 font-medium text-left">Section</th>
+                    <th className="px-2 py-2 font-medium text-left">Address</th>
+                    <th className="px-2 py-2 font-medium text-left">Date of Birth</th>
+                    <th className="px-2 py-2 font-medium text-left">Mobile No.</th>
+                    <th className="px-2 py-2 font-medium text-left">Email</th>
+                    <th className="px-2 py-2 font-medium text-left">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr><td colSpan={13} className="text-center py-8">Loading...</td></tr>
+                  ) : error ? (
+                    <tr><td colSpan={13} className="text-center text-red-600 py-8">{error}</td></tr>
+                  ) : filteredStudents.length === 0 ? (
+                    <tr><td colSpan={13} className="text-center text-gray-500">No students found.</td></tr>
+                  ) : (
+                    filteredStudents.map((student, idx) => (
+                      <tr key={student._id || idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-2 py-2 text-center"><input type="checkbox" checked={selectedRows.includes(student._id)} onChange={() => handleRowSelect(student._id)} /></td>
+                        <td className="px-2 py-2">{student.rollNo || '-'}</td>
+                        <td className="px-2 py-2 text-center">
+                          <img
+                            src={
+                              student.studentPhoto
+                                ? student.studentPhoto.startsWith('http')
+                                  ? student.studentPhoto
+                                  : `http://localhost:8000${student.studentPhoto}`
+                                : 'https://ui-avatars.com/api/?name=Student&background=random'
+                            }
+                            alt="Student"
+                            className="w-8 h-8 rounded-full object-cover mx-auto"
                           />
                         </td>
-                        <td className="px-3 py-2 border">{student.rollNo || '-'}</td>
-                        <td className="px-3 py-2 border">
-                          {student.studentPhoto ? (
-                            <img src={student.studentPhoto.startsWith('http') ? student.studentPhoto : `http://localhost:8000${student.studentPhoto}`} alt="Student" className="w-8 h-8 rounded-full object-cover" />
-                          ) : (
-                            <span className="text-gray-400">No Photo</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-2 border">{student.firstName} {student.lastName}</td>
-                        <td className="px-3 py-2 border">{student.gender}</td>
-                        <td className="px-3 py-2 border">{student.fatherName}</td>
-                        <td className="px-3 py-2 border">{student.class}</td>
-                        <td className="px-3 py-2 border">{student.section}</td>
-                        <td className="px-3 py-2 border">{student.presentAddress}</td>
-                        <td className="px-3 py-2 border">{student.dob}</td>
-                        <td className="px-3 py-2 border">{student.phoneNumber}</td>
-                        <td className="px-3 py-2 border">{student.email}</td>
-                        <td className="px-3 py-2 border flex gap-2 justify-center">
+                        <td className="px-2 py-2">{student.firstName} {student.lastName}</td>
+                        <td className="px-2 py-2">{student.gender}</td>
+                        <td className="px-2 py-2">{student.fatherName || student.parentName || '-'}</td>
+                        <td className="px-2 py-2">{student.class}</td>
+                        <td className="px-2 py-2">{student.section}</td>
+                        <td className="px-2 py-2">{student.presentAddress}</td>
+                        <td className="px-2 py-2">{
+  student.dob
+    ? new Date(student.dob).toLocaleDateString('en-GB')
+    : '-'
+}</td>
+                        <td className="px-2 py-2">{student.phoneNumber}</td>
+                        <td className="px-2 py-2">{student.email}</td>
+                        <td className="px-2 py-2 flex gap-2 justify-center">
                           <button title="View"><FiEye className="text-blue-600 hover:text-blue-800" /></button>
                           <button title="Edit"><FiEdit className="text-green-600 hover:text-green-800" /></button>
                           <button title="Delete"><FiTrash2 className="text-red-600 hover:text-red-800" /></button>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

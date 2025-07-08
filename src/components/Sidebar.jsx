@@ -28,9 +28,9 @@ const Sidebar = () => {
   const menuItems = [
     { path: '/dashboard', icon: <FaHome />, label: 'Dashboard' },
     { path: '/all-students', icon: <FaUserGraduate />, label: 'Students' },
-    { path: '/teachers', icon: <FaChalkboardTeacher />, label: 'Teachers' },
-    { path: '/parents', icon: <FaUsers />, label: 'Parents' },
-    { path: '/library', icon: <FaBook />, label: 'Library' },
+    { path: '/all-teachers', icon: <FaChalkboardTeacher />, label: 'Teachers' },
+    { path: '/all-parents', icon: <FaUsers />, label: 'Parents' },
+    { path: '/all-books', icon: <FaBook />, label: 'Library' },
     { path: '/account', icon: <FaUserCircle />, label: 'Account' },
     { path: '/all-classes', icon: <FaGraduationCap />, label: 'Class' },
     { path: '/subject', icon: <FaBookOpen />, label: 'Subject' },
@@ -38,7 +38,7 @@ const Sidebar = () => {
     { path: '/attendance', icon: <FaUserCheck />, label: 'Attendance' },
     { path: '/exam', icon: <FaFileAlt />, label: 'Exam' },
     { path: '/transport', icon: <FaBus />, label: 'Transport' },
-    { path: '/notice', icon: <FaBell />, label: 'Notice' },
+    { path: '/notice-board', icon: <FaBell />, label: 'Notice' },
     { path: '/message', icon: <FaEnvelope />, label: 'Message' },
     { path: '/map', icon: <FaMapMarkerAlt />, label: 'Map' },
     { path: '/account-settings', icon: <FaCog />, label: 'Account Settings' }

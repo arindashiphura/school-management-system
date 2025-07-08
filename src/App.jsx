@@ -14,6 +14,13 @@ import NoticeBoard from './components/NoticeBoard.jsx'
 import AddClass from './components/AddClass.jsx'
 import AllClasses from './components/AllClasses.jsx'
 import AllParents from './components/AllParents.jsx'
+import AllTeachers from './components/AllTeachers.jsx'
+import BookForm from './components/BookForm.jsx'
+import AllBooks from './components/AllBooks.jsx'
+import ExpenseForm from './components/ExpenseForm.jsx'
+import AllExpenses from './components/AllExpenses.jsx'
+
+
 
 
 // In your main App.js or index.js
@@ -32,6 +39,11 @@ const App = () => {
           <Route path="/add-class" element={<AddClass />} />
           <Route path="/all-classes" element={<AllClasses />} />
           <Route path="/all-parents" element={<AllParents />} />
+          <Route path="/all-teachers" element={<AllTeachers />} />
+          <Route path="/book-form" element={<BookForm />} />
+          <Route path="/all-books" element={<AllBooks />} />
+          <Route path="/expense-form" element={<ExpenseForm />} />
+          <Route path="/all-expenses" element={<AllExpenses />} />
         </Routes>
       </Router>
     </div>
