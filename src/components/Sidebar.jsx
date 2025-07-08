@@ -33,7 +33,7 @@ const Sidebar = () => {
     { path: '/all-books', icon: <FaBook />, label: 'Library' },
     { path: '/account', icon: <FaUserCircle />, label: 'Account' },
     { path: '/all-classes', icon: <FaGraduationCap />, label: 'Class' },
-    { path: '/subject', icon: <FaBookOpen />, label: 'Subject' },
+    { path: '/subjects-page', icon: <FaBookOpen />, label: 'Subject' },
     { path: '/class-routine', icon: <FaCalendarAlt />, label: 'Class Routine' },
     { path: '/attendance', icon: <FaUserCheck />, label: 'Attendance' },
     { path: '/exam', icon: <FaFileAlt />, label: 'Exam' },

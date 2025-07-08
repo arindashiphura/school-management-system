@@ -19,6 +19,11 @@ import BookForm from './components/BookForm.jsx'
 import AllBooks from './components/AllBooks.jsx'
 import ExpenseForm from './components/ExpenseForm.jsx'
 import AllExpenses from './components/AllExpenses.jsx'
+import AllSubjects from './components/AllSubjects.jsx'
+import SubjectForm from './components/SubjectForm.jsx'
+import SubjectsPage from './components/SubjectsPage.jsx'
+
+
 
 
 
@@ -44,6 +49,9 @@ const App = () => {
           <Route path="/all-books" element={<AllBooks />} />
           <Route path="/expense-form" element={<ExpenseForm />} />
           <Route path="/all-expenses" element={<AllExpenses />} />
+          <Route path="/all-subjects" element={<AllSubjects />} />
+          <Route path="/subject-form" element={<SubjectForm />} />
+          <Route path="/subjects-page" element={<SubjectsPage />} />
         </Routes>
       </Router>
     </div>
