@@ -3,6 +3,7 @@ import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { FiEdit2, FiTrash2, FiEye, FiSearch } from 'react-icons/fi';
+import EditBookModal from './EditBookModal';
 
 const AllBooks = () => {
   const [books, setBooks] = useState([]);
@@ -11,6 +12,11 @@ const AllBooks = () => {
   const [searchId, setSearchId] = useState('');
   const [searchWriter, setSearchWriter] = useState('');
   const [viewBook, setViewBook] = useState(null);
+  const [editBook, setEditBook] = useState(null);
+  const [deleteBook, setDeleteBook] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     fetchBooks();
@@ -33,6 +39,33 @@ const AllBooks = () => {
     (!searchId || book.idNo?.toLowerCase().includes(searchId.toLowerCase())) &&
     (!searchWriter || book.writerName?.toLowerCase().includes(searchWriter.toLowerCase()))
   );
+
+  // Edit book handler
+  const handleEditSave = async (form, id) => {
+    try {
+      await axios.put(`http://localhost:8000/api/v1/books/${id}`, form);
+      setEditBook(null);
+      setSuccessMsg('Book updated successfully!');
+      setShowSuccessModal(true);
+      fetchBooks();
+    } catch (err) {
+      alert('Failed to update book.');
+    }
+  };
+  // Delete book handler
+  const handleDelete = async () => {
+    if (!deleteBook) return;
+    setDeleting(true);
+    try {
+      await axios.delete(`http://localhost:8000/api/v1/books/${deleteBook._id}`);
+      setDeleteBook(null);
+      fetchBooks();
+    } catch (err) {
+      alert('Failed to delete book.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="ml-64 flex h-screen bg-gray-100">
@@ -68,6 +101,15 @@ const AllBooks = () => {
                 <FiSearch /> SEARCH
               </button>
             </div>
+            {/* Success message */}
+            {successMsg && (
+              <div className="mb-4 w-full max-w-2xl mx-auto">
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded flex items-center justify-between">
+                  <span>{successMsg}</span>
+                  <button className="ml-4 text-green-700 font-bold" onClick={() => setSuccessMsg('')}>&times;</button>
+                </div>
+              </div>
+            )}
             {/* Table */}
             <div className="overflow-x-auto rounded-lg">
               <table className="min-w-full text-sm">
@@ -102,8 +144,8 @@ const AllBooks = () => {
                         <td className="px-2 py-2">{book.uploadDate ? new Date(book.uploadDate).toLocaleDateString('en-GB') : '-'}</td>
                         <td className="px-2 py-2 flex gap-2 justify-center">
                           <button title="View" onClick={() => setViewBook(book)}><FiEye className="text-blue-600 hover:text-blue-800" /></button>
-                          <button title="Edit"><FiEdit2 className="text-green-600 hover:text-green-800" /></button>
-                          <button title="Delete"><FiTrash2 className="text-red-600 hover:text-red-800" /></button>
+                          <button title="Edit" onClick={() => setEditBook(book)}><FiEdit2 className="text-green-600 hover:text-green-800" /></button>
+                          <button title="Delete" onClick={() => setDeleteBook(book)}><FiTrash2 className="text-red-600 hover:text-red-800" /></button>
                         </td>
                       </tr>
                     ))
@@ -133,6 +175,61 @@ const AllBooks = () => {
                       <div><span className="font-semibold">Upload Date:</span> {viewBook.uploadDate ? new Date(viewBook.uploadDate).toLocaleDateString('en-GB') : '-'}</div>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+            {editBook && (
+              <EditBookModal
+                open={!!editBook}
+                onClose={() => setEditBook(null)}
+                book={editBook}
+                onSave={handleEditSave}
+              />
+            )}
+            {deleteBook && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 relative">
+                  <button
+                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold"
+                    onClick={() => setDeleteBook(null)}
+                    title="Close"
+                  >
+                    &times;
+                  </button>
+                  <div className="text-center">
+                    <h4 className="text-lg font-bold mb-2">Delete Book</h4>
+                    <p className="mb-4">Are you sure you want to delete <span className="font-semibold">{deleteBook.bookName}</span>?</p>
+                    <div className="flex justify-center gap-3 mt-4">
+                      <button
+                        className="px-4 py-1 rounded bg-gray-200 hover:bg-gray-300 font-semibold"
+                        onClick={() => setDeleteBook(null)}
+                        disabled={deleting}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-4 py-1 rounded bg-red-600 text-white hover:bg-red-700 font-semibold"
+                        onClick={handleDelete}
+                        disabled={deleting}
+                      >
+                        {deleting ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Success modal */}
+            {showSuccessModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+                <div className="bg-white rounded-lg shadow-lg px-8 py-8 flex flex-col items-center">
+                  <div className="text-green-700 font-bold text-lg mb-6">{successMsg}</div>
+                  <button
+                    className="bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700"
+                    onClick={() => { setShowSuccessModal(false); setSuccessMsg(''); }}
+                  >
+                    OK
+                  </button>
                 </div>
               </div>
             )}

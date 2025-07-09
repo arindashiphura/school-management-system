@@ -22,6 +22,10 @@ const AddClass = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [isFormVisible, setIsFormVisible] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [startTime, setStartTime] = useState('');
+  const [startPeriod, setStartPeriod] = useState('am');
+  const [endTime, setEndTime] = useState('');
+  const [endPeriod, setEndPeriod] = useState('am');
 
   const handleMinimize = () => setIsMinimized(true);
   const handleMaximize = () => setIsMinimized(false);
@@ -42,6 +46,11 @@ const AddClass = () => {
     setErrors({ ...errors, [e.target.name]: '' });
   };
 
+  const handleStartTimeChange = (e) => setStartTime(e.target.value);
+  const handleStartPeriodChange = (e) => setStartPeriod(e.target.value);
+  const handleEndTimeChange = (e) => setEndTime(e.target.value);
+  const handleEndPeriodChange = (e) => setEndPeriod(e.target.value);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccessMsg('');
@@ -52,6 +61,14 @@ const AddClass = () => {
       return;
     }
     setIsSubmitting(true);
+    // Format timings
+    const formatTime = (time, period) => {
+      if (!time) return '';
+      let [h, m] = time.split(':');
+      h = h.padStart(2, '0');
+      return `${h}:${m} ${period}`;
+    };
+    const timings = `${formatTime(startTime, startPeriod)} - ${formatTime(endTime, endPeriod)}`;
     try {
       await axios.post('http://localhost:8000/api/v1/classes', {
         classId: formData.id,
@@ -61,7 +78,7 @@ const AddClass = () => {
         class: formData.class,
         section: formData.section,
         date: formData.date,
-        timings: formData.time,
+        timings,
         photo: formData.photo || '',
       });
       setIsSubmitting(false);
@@ -77,6 +94,10 @@ const AddClass = () => {
         gender: '',
         photo: '',
       });
+      setStartTime('');
+      setStartPeriod('am');
+      setEndTime('');
+      setEndPeriod('am');
     } catch (error) {
       setIsSubmitting(false);
       setErrorMsg('Failed to add class.');
@@ -191,30 +212,48 @@ const AddClass = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-gray-700 text-sm mb-1">Time</label>
-                    <select
-                      name="time"
-                      value={formData.time}
-                      onChange={handleChange}
-                      className="bg-gray-100 px-3 py-2 rounded w-full text-sm focus:outline-none"
-                    >
-                      <option value="">Select Time</option>
-                      <option value="Morning">Morning</option>
-                      <option value="Afternoon">Afternoon</option>
-                    </select>
+                    <label className="block text-gray-700 text-sm mb-1">Start Time</label>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="time"
+                        value={startTime}
+                        onChange={handleStartTimeChange}
+                        className="bg-gray-100 px-3 py-2 rounded w-full text-sm focus:outline-none"
+                        required
+                      />
+                      <select value={startPeriod} onChange={handleStartPeriodChange} className="bg-gray-100 px-2 py-2 rounded text-sm">
+                        <option value="am">AM</option>
+                        <option value="pm">PM</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm mb-1">End Time</label>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="time"
+                        value={endTime}
+                        onChange={handleEndTimeChange}
+                        className="bg-gray-100 px-3 py-2 rounded w-full text-sm focus:outline-none"
+                        required
+                      />
+                      <select value={endPeriod} onChange={handleEndPeriodChange} className="bg-gray-100 px-2 py-2 rounded text-sm">
+                        <option value="am">AM</option>
+                        <option value="pm">PM</option>
+                      </select>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-gray-700 text-sm mb-1">Date</label>
                     <input
-                      type="text"
+                      type="date"
                       name="date"
                       value={formData.date}
                       onChange={handleChange}
-                      placeholder="dd/mm/yyyy"
                       className="bg-gray-100 px-3 py-2 rounded w-full text-sm focus:outline-none"
+                      required
                     />
                   </div>
-                  <div></div>
                 </div>
                 {/* Buttons */}
                 <div className="flex gap-4 mt-4">
