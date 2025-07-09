@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import ViewStudentModal from './ViewStudentModal';
+import EditStudentModal from './EditStudentModal';
 import { FiEdit, FiTrash2, FiEye, FiCheck, FiX, FiMinus, FiMaximize2 } from 'react-icons/fi';
 
 const AllStudents = () => {
@@ -15,6 +17,20 @@ const AllStudents = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
+
+  // Modal state for viewing student
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewStudent, setViewStudent] = useState(null);
+
+  // Modal state for editing student
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editStudent, setEditStudent] = useState(null);
+
+  // Delete modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteStudent, setDeleteStudent] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -74,6 +90,41 @@ const AllStudents = () => {
   const handleMaximize = () => setIsMaximized(true);
   const handleClose = () => setIsClosed(true);
 
+  // Handle save from EditStudentModal (now handles FormData for photo upload)
+  const handleEditSave = async (formData, studentId) => {
+    try {
+      await axios.put(`http://localhost:8000/api/v1/students/${studentId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      // Refresh students list after update
+      const res = await axios.get('http://localhost:8000/api/v1/students/all');
+      setStudents(res.data.students || []);
+      setFilteredStudents(res.data.students || []);
+    } catch (err) {
+      alert('Failed to update student.');
+    }
+  };
+
+  // Handle delete
+  const handleDelete = async () => {
+    if (!deleteStudent) return;
+    setDeleteLoading(true);
+    try {
+      await axios.delete(`http://localhost:8000/api/v1/students/${deleteStudent._id}`);
+      // Refresh students list after delete
+      const res = await axios.get('http://localhost:8000/api/v1/students/all');
+      setStudents(res.data.students || []);
+      setFilteredStudents(res.data.students || []);
+      setDeleteSuccess(true);
+    } catch (err) {
+      alert('Failed to delete student.');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   if (isClosed) return null;
 
   return (
@@ -90,7 +141,7 @@ const AllStudents = () => {
             <h2 className="text-xl font-bold mb-2">All Students</h2>
             <hr className="mb-6 border-gray-200" />
             {/* Filter/Search Bar with Icons */}
-            <div className="flex gap-2 mb-4 justify-end items-center">
+            <div className="flex gap-2 mb-4 justify-end items-center bg-gray-50 p-2 rounded-lg shadow-sm">
               <input
                 type="text"
                 placeholder="Type Roll No..."
@@ -107,15 +158,13 @@ const AllStudents = () => {
               />
               <button
                 onClick={handleSearch}
-                className="bg-blue-600 text-white px-4 py-1 rounded font-semibold"
+                className="bg-blue-600 text-white px-4 py-1 rounded font-semibold shadow hover:bg-blue-700"
               >
                 SEARCH
               </button>
-              <button title="Select All" onClick={handleSelectAll} className="text-green-600"><FiCheck size={18} /></button>
-              <button title="Clear Selection" onClick={handleClearSelection} className="text-red-600"><FiX size={18} /></button>
-              <button title="Minimize" onClick={handleMinimize} className="text-gray-500"><FiMinus size={18} /></button>
-              <button title="Maximize" onClick={handleMaximize} className="text-gray-500"><FiMaximize2 size={18} /></button>
-              <button title="Close" onClick={handleClose} className="text-gray-500"><FiX size={18} /></button>
+              <button title="Minimize" onClick={handleMinimize} className="text-gray-500 hover:text-gray-700 border border-gray-200 rounded p-1"><FiMinus size={18} /></button>
+              <button title="Maximize" onClick={handleMaximize} className="text-gray-500 hover:text-gray-700 border border-gray-200 rounded p-1"><FiMaximize2 size={18} /></button>
+              <button title="Close" onClick={handleClose} className="text-gray-500 hover:text-gray-700 border border-gray-200 rounded p-1"><FiX size={18} /></button>
             </div>
             {/* Table */}
             <div className="overflow-x-auto rounded-lg">
@@ -148,7 +197,15 @@ const AllStudents = () => {
                     filteredStudents.map((student, idx) => (
                       <tr key={student._id || idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                         <td className="px-2 py-2 text-center"><input type="checkbox" checked={selectedRows.includes(student._id)} onChange={() => handleRowSelect(student._id)} /></td>
-                        <td className="px-2 py-2">{student.rollNo || '-'}</td>
+                        <td
+                          className="px-2 py-2 text-blue-600 hover:underline cursor-pointer"
+                          onClick={() => {
+                            setViewStudent(student);
+                            setViewModalOpen(true);
+                          }}
+                        >
+                          {student.rollNo || '-'}
+                        </td>
                         <td className="px-2 py-2 text-center">
                           <img
                             src={
@@ -176,9 +233,36 @@ const AllStudents = () => {
                         <td className="px-2 py-2">{student.phoneNumber}</td>
                         <td className="px-2 py-2">{student.email}</td>
                         <td className="px-2 py-2 flex gap-2 justify-center">
-                          <button title="View"><FiEye className="text-blue-600 hover:text-blue-800" /></button>
-                          <button title="Edit"><FiEdit className="text-green-600 hover:text-green-800" /></button>
-                          <button title="Delete"><FiTrash2 className="text-red-600 hover:text-red-800" /></button>
+                          <button
+                            title="View"
+                            className="hover:scale-110 transition-transform cursor-pointer"
+                            onClick={() => {
+                              setViewStudent(student);
+                              setViewModalOpen(true);
+                            }}
+                          >
+                            <FiEye className="text-blue-600 hover:text-blue-800" />
+                          </button>
+                          <button
+                            title="Edit"
+                            className="hover:scale-110 transition-transform cursor-pointer"
+                            onClick={() => {
+                              setEditStudent(student);
+                              setEditModalOpen(true);
+                            }}
+                          >
+                            <FiEdit className="text-green-600 hover:text-green-800" />
+                          </button>
+                          <button
+                            title="Delete"
+                            className="hover:scale-110 transition-transform cursor-pointer"
+                            onClick={() => {
+                              setDeleteStudent(student);
+                              setDeleteModalOpen(true);
+                            }}
+                          >
+                            <FiTrash2 className="text-red-600 hover:text-red-800" />
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -189,6 +273,63 @@ const AllStudents = () => {
           </div>
         </div>
       </div>
+      <ViewStudentModal
+        open={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        student={viewStudent}
+      />
+      <EditStudentModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        student={editStudent}
+        onSave={handleEditSave}
+        onSuccess={() => {
+          setEditModalOpen(false);
+        }}
+      />
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative text-center">
+            <h4 className="text-lg font-bold mb-4 text-red-700">Are you sure you want to delete this student?</h4>
+            <div className="mb-4 text-gray-700">{deleteStudent && `${deleteStudent.firstName} ${deleteStudent.lastName} (${deleteStudent.rollNo})`}</div>
+            <div className="flex justify-center gap-4 mt-4">
+              <button
+                className="px-5 py-2 rounded bg-gray-200 hover:bg-gray-300 font-semibold"
+                onClick={() => setDeleteModalOpen(false)}
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-5 py-2 rounded bg-red-600 text-white hover:bg-red-700 font-semibold"
+                onClick={handleDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Delete Success Modal */}
+      {deleteSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative text-center">
+            <h4 className="text-lg font-bold mb-4 text-green-700">Student deleted successfully!</h4>
+            <button
+              className="px-5 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 font-semibold mt-2"
+              onClick={() => {
+                setDeleteSuccess(false);
+                setDeleteModalOpen(false);
+                setDeleteStudent(null);
+              }}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

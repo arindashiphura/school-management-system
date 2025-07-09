@@ -3,6 +3,7 @@ import axios from 'axios';
 import { FiEdit2, FiTrash2, FiSearch, FiEye } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import EditTeacherModal from './EditTeacherModal';
 
 const placeholderPhoto = 'https://ui-avatars.com/api/?name=Teacher&background=random';
 
@@ -13,6 +14,18 @@ const AllTeachers = () => {
   const [searchName, setSearchName] = useState('');
   const [searchClass, setSearchClass] = useState('');
   const [viewTeacher, setViewTeacher] = useState(null);
+
+  // Edit modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editTeacher, setEditTeacher] = useState(null);
+  const [editSuccess, setEditSuccess] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+
+  // Delete modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteTeacher, setDeleteTeacher] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
   useEffect(() => {
     fetchTeachers();
@@ -28,6 +41,35 @@ const AllTeachers = () => {
       setError('Failed to fetch teachers.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditSave = async (formData, teacherId) => {
+    setEditLoading(true);
+    try {
+      await axios.put(`http://localhost:8000/api/v1/teachers/${teacherId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setEditSuccess(true);
+      await fetchTeachers();
+    } catch (err) {
+      alert('Failed to update teacher.');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTeacher) return;
+    setDeleteLoading(true);
+    try {
+      await axios.delete(`http://localhost:8000/api/v1/teachers/${deleteTeacher._id}`);
+      setDeleteSuccess(true);
+      await fetchTeachers();
+    } catch (err) {
+      alert('Failed to delete teacher.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -130,8 +172,24 @@ const AllTeachers = () => {
                         <td className="px-2 py-2">{teacher.email}</td>
                         <td className="px-2 py-2 flex gap-2 justify-center">
                           <button title="View" onClick={() => setViewTeacher(teacher)}><FiEye className="text-blue-600 hover:text-blue-800" /></button>
-                          <button title="Edit"><FiEdit2 className="text-green-600 hover:text-green-800" /></button>
-                          <button title="Delete"><FiTrash2 className="text-red-600 hover:text-red-800" /></button>
+                          <button
+                            title="Edit"
+                            onClick={() => {
+                              setEditTeacher(teacher);
+                              setEditModalOpen(true);
+                            }}
+                          >
+                            <FiEdit2 className="text-green-600 hover:text-green-800" />
+                          </button>
+                          <button
+                            title="Delete"
+                            onClick={() => {
+                              setDeleteTeacher(teacher);
+                              setDeleteModalOpen(true);
+                            }}
+                          >
+                            <FiTrash2 className="text-red-600 hover:text-red-800" />
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -175,6 +233,77 @@ const AllTeachers = () => {
                       <div><span className="font-semibold">Email:</span> {viewTeacher.email}</div>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+            {/* Edit Modal */}
+            <EditTeacherModal
+              open={editModalOpen}
+              onClose={() => {
+                setEditModalOpen(false);
+                setEditTeacher(null);
+              }}
+              teacher={editTeacher}
+              onSave={handleEditSave}
+            />
+            {/* Edit Success Modal */}
+            {editSuccess && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative text-center">
+                  <h4 className="text-lg font-bold mb-4 text-green-700">Teacher updated successfully!</h4>
+                  <button
+                    className="px-5 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 font-semibold mt-2"
+                    onClick={() => {
+                      setEditSuccess(false);
+                      setEditModalOpen(false);
+                      setEditTeacher(null);
+                    }}
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* Delete Confirmation Modal */}
+            {deleteModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative text-center">
+                  <h4 className="text-lg font-bold mb-4 text-red-700">Are you sure you want to delete this teacher?</h4>
+                  <div className="mb-4 text-gray-700">{deleteTeacher && `${deleteTeacher.name} (${deleteTeacher.teacherId})`}</div>
+                  <div className="flex justify-center gap-4 mt-4">
+                    <button
+                      className="px-5 py-2 rounded bg-gray-200 hover:bg-gray-300 font-semibold"
+                      onClick={() => setDeleteModalOpen(false)}
+                      disabled={deleteLoading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-5 py-2 rounded bg-red-600 text-white hover:bg-red-700 font-semibold"
+                      onClick={handleDelete}
+                      disabled={deleteLoading}
+                    >
+                      {deleteLoading ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Delete Success Modal */}
+            {deleteSuccess && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative text-center">
+                  <h4 className="text-lg font-bold mb-4 text-green-700">Teacher deleted successfully!</h4>
+                  <button
+                    className="px-5 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 font-semibold mt-2"
+                    onClick={() => {
+                      setDeleteSuccess(false);
+                      setDeleteModalOpen(false);
+                      setDeleteTeacher(null);
+                    }}
+                  >
+                    OK
+                  </button>
                 </div>
               </div>
             )}
