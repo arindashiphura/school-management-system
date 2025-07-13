@@ -22,6 +22,13 @@ import AllExpenses from './components/AllExpenses.jsx'
 import AllSubjects from './components/AllSubjects.jsx'
 import SubjectForm from './components/SubjectForm.jsx'
 import SubjectsPage from './components/SubjectsPage.jsx'
+import AttendancePage from './components/AttendancePage.jsx'
+import ClassRoutinePage from './components/ClassRoutinePage.jsx';
+import ExamSchedulePage from './components/ExamSchedulePage.jsx';
+import ExamGradesPage from './components/ExamGradesPage.jsx';
+import MessagePage from './components/MessagePage.jsx';
+
+
 
 
 
@@ -52,6 +59,16 @@ const App = () => {
           <Route path="/all-subjects" element={<AllSubjects />} />
           <Route path="/subject-form" element={<SubjectForm />} />
           <Route path="/subjects-page" element={<SubjectsPage />} />
+          <Route path="/attendance-page" element={<AttendancePage />} />
+          <Route path="/class-routine" element={<ClassRoutinePage />} />
+          <Route path="/exam-schedule" element={<ExamSchedulePage />} />
+          <Route path="/grades" element={<ExamGradesPage />} />
+          <Route path='messages' element={<MessagePage/>}/>
+
+
+
+
+          
         </Routes>
       </Router>
     </div>

@@ -23,7 +23,6 @@ const Sidebar = () => {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
   const menuItems = [
     { path: '/dashboard', icon: <FaHome />, label: 'Dashboard' },
@@ -36,7 +35,7 @@ const Sidebar = () => {
     { path: '/subjects-page', icon: <FaBookOpen />, label: 'Subject' },
     { path: '/class-routine', icon: <FaCalendarAlt />, label: 'Class Routine' },
     { path: '/attendance', icon: <FaUserCheck />, label: 'Attendance' },
-    { path: '/exam', icon: <FaFileAlt />, label: 'Exam' },
+    { path: '/exam-schedule', icon: <FaFileAlt />, label: 'Exam' },
     { path: '/transport', icon: <FaBus />, label: 'Transport' },
     { path: '/notice-board', icon: <FaBell />, label: 'Notice' },
     { path: '/message', icon: <FaEnvelope />, label: 'Message' },
@@ -47,9 +46,7 @@ const Sidebar = () => {
   return (
     <div className={`h-screen bg-[#002147] text-white fixed top-0 left-0 z-50 overflow-y-auto transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Toggle Button */}
-      <div className="absolute top-4 right-[-40px] bg-orange-500 text-white p-2 rounded-r cursor-pointer z-50" onClick={toggleSidebar}>
-        {isCollapsed ? '☰' : '×'}
-      </div>
+      
 
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 py-4 bg-orange-500 h-16">
