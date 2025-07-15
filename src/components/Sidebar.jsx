@@ -34,13 +34,14 @@ const Sidebar = () => {
     { path: '/all-classes', icon: <FaGraduationCap />, label: 'Class' },
     { path: '/subjects-page', icon: <FaBookOpen />, label: 'Subject' },
     { path: '/class-routine', icon: <FaCalendarAlt />, label: 'Class Routine' },
-    { path: '/attendance', icon: <FaUserCheck />, label: 'Attendance' },
+    { path: '/fees-collection', icon: <FaUserCheck />, label: 'Fee Payments' },
     { path: '/exam-schedule', icon: <FaFileAlt />, label: 'Exam' },
-    { path: '/transport', icon: <FaBus />, label: 'Transport' },
+    { path: '/all-expenses', icon: <FaBus />, label: 'Expense' },
     { path: '/notice-board', icon: <FaBell />, label: 'Notice' },
-    { path: '/message', icon: <FaEnvelope />, label: 'Message' },
+    { path: '/messages', icon: <FaEnvelope />, label: 'Message' },
     { path: '/map', icon: <FaMapMarkerAlt />, label: 'Map' },
     { path: '/account-settings', icon: <FaCog />, label: 'Account Settings' }
+
   ];
 
   return (

@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import { FiEdit2, FiTrash2, FiEye, FiSearch } from 'react-icons/fi';
 import EditBookModal from './EditBookModal';
+import LoadingSpinner from './LoadingSpinner';
 
 const AllBooks = () => {
   const [books, setBooks] = useState([]);
@@ -127,7 +128,7 @@ const AllBooks = () => {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan={8} className="text-center py-8">Loading...</td></tr>
+                    <LoadingSpinner text="Loading books..." />
                   ) : error ? (
                     <tr><td colSpan={8} className="text-center text-red-600 py-8">{error}</td></tr>
                   ) : filteredBooks.length === 0 ? (

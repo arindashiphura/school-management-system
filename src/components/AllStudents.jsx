@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import ViewStudentModal from './ViewStudentModal';
 import EditStudentModal from './EditStudentModal';
+import LoadingSpinner from './LoadingSpinner';
 import { FiEdit, FiTrash2, FiEye, FiCheck, FiX, FiMinus, FiMaximize2 } from 'react-icons/fi';
 
 const AllStudents = () => {
@@ -188,7 +189,7 @@ const AllStudents = () => {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan={13} className="text-center py-8">Loading...</td></tr>
+                    <LoadingSpinner text="Loading students..." />
                   ) : error ? (
                     <tr><td colSpan={13} className="text-center text-red-600 py-8">{error}</td></tr>
                   ) : filteredStudents.length === 0 ? (

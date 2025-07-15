@@ -27,6 +27,7 @@ import ClassRoutinePage from './components/ClassRoutinePage.jsx';
 import ExamSchedulePage from './components/ExamSchedulePage.jsx';
 import ExamGradesPage from './components/ExamGradesPage.jsx';
 import MessagePage from './components/MessagePage.jsx';
+import FeesCollectionTable from './components/FeesCollectionTable.jsx';
 
 
 
@@ -64,6 +65,7 @@ const App = () => {
           <Route path="/exam-schedule" element={<ExamSchedulePage />} />
           <Route path="/grades" element={<ExamGradesPage />} />
           <Route path='messages' element={<MessagePage/>}/>
+          <Route path="/fees-collection" element={<FeesCollectionTable />} />
 
 
 

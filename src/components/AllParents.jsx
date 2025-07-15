@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import ViewParentModal from './ViewParentModal';
 import EditParentModal from './EditParentModal';
+import LoadingSpinner from './LoadingSpinner';
 
 const placeholderPhoto = 'https://ui-avatars.com/api/?name=Parent&background=random';
 
@@ -131,7 +132,7 @@ const AllParents = () => {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan={10} className="text-center py-8">Loading...</td></tr>
+                    <LoadingSpinner text="Loading parents..." />
                   ) : error ? (
                     <tr><td colSpan={10} className="text-center text-red-600 py-8">{error}</td></tr>
                   ) : filteredParents.length === 0 ? (

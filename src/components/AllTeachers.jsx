@@ -4,6 +4,7 @@ import { FiEdit2, FiTrash2, FiSearch, FiEye } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import EditTeacherModal from './EditTeacherModal';
+import LoadingSpinner from './LoadingSpinner';
 
 const placeholderPhoto = 'https://ui-avatars.com/api/?name=Teacher&background=random';
 
@@ -134,7 +135,7 @@ const AllTeachers = () => {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan={13} className="text-center py-8">Loading...</td></tr>
+                    <LoadingSpinner text="Loading teachers..." />
                   ) : error ? (
                     <tr><td colSpan={13} className="text-center text-red-600 py-8">{error}</td></tr>
                   ) : filteredTeachers.length === 0 ? (

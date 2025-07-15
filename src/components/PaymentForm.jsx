@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { FiMinus, FiMaximize2, FiX } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import axios from 'axios';
 
 const PaymentForm = () => {
   const [formData, setFormData] = useState({
+    studentId: '',
+    rollNo: '',
     name: '',
-    id: '',
     class: '',
     section: '',
-    totalFee: '',
+    amount: '',
     paymentMethod: '',
     status: '',
     date: '',
@@ -20,6 +22,10 @@ const PaymentForm = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [isFormVisible, setIsFormVisible] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [studentQuery, setStudentQuery] = useState('');
+  const [studentOptions, setStudentOptions] = useState([]);
+  const [studentSearchLoading, setStudentSearchLoading] = useState(false);
+  const [studentNotFound, setStudentNotFound] = useState(false);
 
   const handleMinimize = () => setIsMinimized(true);
   const handleMaximize = () => setIsMinimized(false);
@@ -30,10 +36,10 @@ const PaymentForm = () => {
   const validate = () => {
     const newErrors = {};
     if (!formData.name) newErrors.name = 'Name is required';
-    if (!formData.id) newErrors.id = 'ID is required';
+    if (!formData.studentId) newErrors.studentId = 'Student selection is required';
     if (!formData.class) newErrors.class = 'Class is required';
     if (!formData.section) newErrors.section = 'Section is required';
-    if (!formData.totalFee) newErrors.totalFee = 'Total fee is required';
+    if (!formData.amount) newErrors.amount = 'Amount is required';
     if (!formData.paymentMethod) newErrors.paymentMethod = 'Payment method is required';
     if (!formData.status) newErrors.status = 'Status is required';
     if (!formData.date) newErrors.date = 'Date is required';
@@ -54,8 +60,14 @@ const PaymentForm = () => {
     if (Object.keys(validationErrors).length > 0) return;
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Determine the student's required fee
+      const studentFee = formData.fee || formData.amount; // fallback if not available
+      let statusValue = formData.status;
+      if (Number(formData.amount) >= Number(studentFee)) {
+        statusValue = null;
+      }
+      const payload = { ...formData, status: statusValue };
+      await axios.post('http://localhost:8000/api/v1/payments', payload);
       setSuccessMsg('Payment recorded successfully!');
       setErrorMsg('');
       handleReset();
@@ -69,13 +81,47 @@ const PaymentForm = () => {
 
   const handleReset = () => {
     setFormData({
+      studentId: '',
+      rollNo: '',
       name: '',
-      id: '',
       class: '',
       section: '',
-      totalFee: '',
+      amount: '',
       paymentMethod: '',
       status: '',
+      date: '',
+    });
+    setErrors({});
+  };
+
+  // Autocomplete search handler
+  const handleStudentSearch = async (query) => {
+    setStudentQuery(query);
+    setStudentSearchLoading(true);
+    setStudentNotFound(false);
+    try {
+      const res = await axios.get(`http://localhost:8000/api/v1/students/search?query=${encodeURIComponent(query)}`);
+      setStudentOptions(res.data.students || []);
+      setStudentNotFound((res.data.students || []).length === 0);
+    } catch (err) {
+      setStudentOptions([]);
+      setStudentNotFound(true);
+    } finally {
+      setStudentSearchLoading(false);
+    }
+  };
+
+  // When a student is selected from autocomplete
+  const handleStudentSelect = (student) => {
+    setFormData({
+      studentId: student._id,
+      rollNo: student.rollNo,
+      name: student.firstName + ' ' + student.lastName,
+      class: student.class,
+      section: student.section,
+      amount: '',
+      paymentMethod: '',
+      status: student.status || '',
       date: '',
     });
     setErrors({});
@@ -104,6 +150,32 @@ const PaymentForm = () => {
               {errorMsg && <div className="mb-4 text-red-600 font-semibold">{errorMsg}</div>}
               {!isMinimized && (
                 <form onSubmit={handleSubmit}>
+                  {/* Autocomplete Student Search */}
+                  <div className="mb-6">
+                    <label className="block text-xs font-medium mb-1">Search Student (Name, ID, Class, Section)</label>
+                    <input
+                      type="text"
+                      value={studentQuery}
+                      onChange={e => handleStudentSearch(e.target.value)}
+                      placeholder="Type to search..."
+                      className="w-full bg-gray-100 border-none rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400"
+                    />
+                    {studentSearchLoading && <div className="text-xs text-gray-500 mt-1">Searching...</div>}
+                    {studentOptions.length > 0 && (
+                      <ul className="bg-white border rounded shadow mt-1 max-h-40 overflow-y-auto z-10">
+                        {studentOptions.map(student => (
+                          <li
+                            key={student._id}
+                            className="px-3 py-2 hover:bg-blue-100 cursor-pointer"
+                            onClick={() => handleStudentSelect(student)}
+                          >
+                            {student.firstName} {student.lastName} | {student.rollNo} | Class: {student.class} | Section: {student.section}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {studentNotFound && <div className="text-xs text-red-500 mt-1">No student found. <a href='/student-admission-form' className='text-blue-600 underline'>Register new student</a></div>}
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div>
                       <label className="block text-xs font-medium mb-1">Name</label>
@@ -134,9 +206,9 @@ const PaymentForm = () => {
                       {errors.section && <div className="text-xs text-red-500 mt-1">{errors.section}</div>}
                     </div>
                     <div>
-                      <label className="block text-xs font-medium mb-1">Total Fee</label>
-                      <input name="totalFee" value={formData.totalFee} onChange={handleChange} placeholder="Total Fee" className={`w-full bg-gray-100 border-none rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 ${errors.totalFee ? 'border border-red-500' : ''}`} />
-                      {errors.totalFee && <div className="text-xs text-red-500 mt-1">{errors.totalFee}</div>}
+                      <label className="block text-xs font-medium mb-1">Amount</label>
+                      <input name="amount" value={formData.amount} onChange={handleChange} placeholder="Amount" className={`w-full bg-gray-100 border-none rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 ${errors.amount ? 'border border-red-500' : ''}`} />
+                      {errors.amount && <div className="text-xs text-red-500 mt-1">{errors.amount}</div>}
                     </div>
                     <div>
                       <label className="block text-xs font-medium mb-1">Payment Method</label>
